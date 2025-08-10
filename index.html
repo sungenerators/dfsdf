@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viperxx IA - Login</title>
+  <style>
+    /* Estilos generales */
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+      color: white;
+      transition: background-color 0.8s ease, color 0.8s ease;
+    }
+
+    /* Pantalla splash */
+    #splash {
+      font-size: 5rem;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    #splash.fade {
+      opacity: 0;
+    }
+
+    /* Contenedor login */
+    #login {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      color: black;
+      min-width: 320px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      background: white;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #f0f0f0;
+    }
+
+    button img {
+      height: 20px;
+      width: 20px;
+    }
+
+    .create-account {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .create-account a {
+      color: #0070f3;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .create-account a:hover {
+      text-decoration: underline;
+    }
+
+    #userInfo {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Pantalla splash -->
+  <div id="splash">Viperxx IA</div>
+
+  <!-- Panel login -->
+  <div id="login">
+    <button id="googleLogin">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png" alt="Google" />
+      Iniciar sesión con Google
+    </button>
+    <button id="appleLogin">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" />
+      Iniciar sesión con Apple
+    </button>
+    <div class="create-account">
+      ¿No tienes cuenta? <a href="#" id="createAccountLink">Create account</a>
+    </div>
+    <div id="userInfo"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-auth-compat.js"></script>
+
+  <script>
+    // Configuración Firebase (tu configuración)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKPhtHjOuK21njKLyNZtdOG4b_Pum0quE",
+      authDomain: "viperxx-ia.firebaseapp.com",
+      projectId: "viperxx-ia",
+      storageBucket: "viperxx-ia.firebasestorage.app",
+      messagingSenderId: "346239583187",
+      appId: "1:346239583187:web:030e6e75d838e4655ea526"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Manejar splash y transición a login
+    setTimeout(() => {
+      const splash = document.getElementById("splash");
+      splash.classList.add("fade");
+
+      setTimeout(() => {
+        // Cambiar fondo y color
+        document.body.style.backgroundColor = "white";
+        document.body.style.color = "black";
+
+        splash.style.display = "none";
+        document.getElementById("login").style.display = "flex";
+      }, 1000);
+    }, 3000);
+
+    // Login con Google
+    document.getElementById("googleLogin").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          const user = result.user;
+          mostrarUsuario(user);
+        })
+        .catch(error => {
+          console.error(error);
+          alert("Error al iniciar sesión con Google.");
+        });
+    });
+
+    // Login con Apple (solo ejemplo, sin funcionalidad)
+    document.getElementById("appleLogin").addEventListener("click", () => {
+      alert("Funcionalidad de inicio de sesión con Apple no implementada aún.");
+    });
+
+    // Mostrar info del usuario
+    function mostrarUsuario(user) {
+      const userInfoDiv = document.getElementById("userInfo");
+      userInfoDiv.innerHTML = `
+        <p>Bienvenido, <strong>${user.displayName}</strong></p>
+        <img src="${user.photoURL}" alt="Foto usuario" width="70" style="border-radius: 50%;"/>
+        <br/><button id="logoutBtn">Cerrar sesión</button>
+      `;
+
+      // Ocultar botones de login
+      document.getElementById("googleLogin").style.display = "none";
+      document.getElementById("appleLogin").style.display = "none";
+
+      // Logout
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        auth.signOut().then(() => {
+          userInfoDiv.innerHTML = "";
+          document.getElementById("googleLogin").style.display = "flex";
+          document.getElementById("appleLogin").style.display = "flex";
+        });
+      });
+    }
+
+    // Handler para "Create account" - muestra un alert por ahora
+    document.getElementById("createAccountLink").addEventListener("click", e => {
+      e.preventDefault();
+      alert("Aquí podrías mostrar un formulario para crear cuenta con email y contraseña.");
+    });
+
+  </script>
+</body>
+</html>
